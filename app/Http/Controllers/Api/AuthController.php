@@ -25,6 +25,10 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        if(is_null($request->email) || is_null($request->password)) {
+            return response()->json(['message' => 'Email ou senha não existente!']);
+        }
+
         $credentials = $request->only(['email', 'password']);
 
         if (!$token = auth('api')->attempt($credentials)) {
