@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+Route::get('teste', function () {
+    return response()->json(['Api de teste OK :)']);
+});
+
 Route::post('auth/login', 'Api\AuthController@login');
 
 Route::middleware(['apiJwt'])->group(function () {
