@@ -32,9 +32,6 @@ class AuthController extends Controller
 
         $credentials = $request->only(['email', 'password']);
 
-        $user = User::query();
-        dd($user->toSql());
-
         if (!$token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Você não está autorizado!'], 401);
         }
