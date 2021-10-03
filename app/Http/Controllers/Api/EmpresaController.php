@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PessoaRequest;
+use App\Http\Requests\EmpresaRequest;
 use App\Empresa;
 use App\Http\Resources\Api\EmpresaResource;
 use GuzzleHttp\Client;
@@ -15,21 +15,15 @@ use Illuminate\Support\Facades\Validator;
 class EmpresaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista ou filtra todos as empresas
      *
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index()
-    {
-        $empresas = Empresa::query()->paginate(10);
-        return EmpresaResource::collection($empresas);
-    }
-
-    public function search(Request $request)
+    public function index(Request $request)
     {
         $empresas = Empresa::query();
 
-//        dd($request->header('cpf_cnpj'));
         if ($request->exists('cpf_cnpj')) {
             $empresas->where('cpf_cnpj', $request->query('cpf_cnpj'));
         }
@@ -71,82 +65,14 @@ class EmpresaController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cria uma nova empresa
      *
-     * @param  Request  $request
+     * @param  EmpresaRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(EmpresaRequest $request)
     {
-        $validacao = Validator::make($request->all(), [
-            'tipo_pessoa' => 'required',
-            'tipo_contribuinte' => 'required',
-            'tipo_cadastro' => 'required',
-            'estado' => 'required',
-            'cidade' => 'required',
-            'pais' => 'required',
-
-            'cpf_cnpj' => 'required',
-            'razao_social' => 'required',
-            'email' => 'email',
-
-            'cep' => 'required',
-            'logradouro' => 'required',
-            'bairro' => 'required',
-
-            'nome_fantasia' => 'required_if:tipo_pessoa,==,J',
-            'inscricao_estadual' => 'required_if:tipo_contribuinte,==,1',
-            'fone_principal' => 'required_without:fone_secundario',
-            'fone_secundario' => 'required_without:fone_principal',
-            'numero' => '',
-
-        ]);
-
-        if ($request->isNotFilled('numero')) {
-            $request->merge(['numero' => 'SN']);
-        }
-
-        if ($request->tipo_pessoa === 'F' and $request->inscricao_estadual) {
-            $request->request->remove('inscricao_estadual');
-        }
-
-        if ($request->estado == 'Goiás' and $request->tipo_cadastro == 'Variante') {
-            $request->merge([
-                'message' => [
-                    'Mandar equipe de campo'
-                ]
-            ]);
-        }
-
-        if ($request->estado == 'São Paulo' and
-            $request->tipo_cadastro == 'Variante' and
-            $request->tipo_pessoa == 'F'
-        ) {
-            $request->merge(['message' => ['Reavaliar em 2 meses']]);
-        }
-
-        if ($request->estado == 'Ceará' and
-            $request->tipo_cadastro == 'Variante' and
-            $request->tipo_pessoa == 'F' and
-            $request->filled('observacao')) {
-            $request->merge(['message' => ['Possível violação do tratado Beta']]);
-        }
-
-        if ($request->estado == 'Tocantins' and
-            $request->tipo_cadastro == 'Variante' and
-            $request->tipo_pessoa == 'F' and
-            $request->filled('observacao')) {
-            $request->merge(['message' => ['Possível violação do tratado Celta']]);
-        }
-
-        if ($request->estado == 'Amazonas' and
-            $request->tipo_cadastro == 'Variante' and
-            $request->tipo_pessoa == 'F' and
-            $request->filled('observacao')
-        ) {
-            $request->merge(['message' => ['Possível violação do tratado Alpha']]);
-        }
-
+        $validacao = Validator::make($request->all(), $request->rules());
 
         if ($validacao->fails()) {
             return response()->json($validacao->errors());
@@ -170,85 +96,14 @@ class EmpresaController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
+     * Atualiza uma empresa especifica
+     * @param EmpresaRequest $request
      * @param  Empresa  $empresa
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Empresa $empresa)
+    public function update(EmpresaRequest $request, Empresa $empresa)
     {
-        $validacao = Validator::make($request->all(), [
-            'tipo_pessoa' => 'required',
-            'tipo_contribuinte' => 'required',
-            'tipo_cadastro' => 'required',
-            'estado' => 'required',
-            'cidade' => 'required',
-            'pais' => 'required',
-
-            'cpf_cnpj' => 'required',
-            'razao_social' => 'required',
-            'email' => 'email',
-
-            'cep' => 'required',
-            'logradouro' => 'required',
-            'bairro' => 'required',
-
-            'nome_fantasia' => 'required_if:tipo_pessoa,==,J',
-            'inscricao_estadual' => 'required_if:tipo_contribuinte,==,1',
-            'fone_principal' => 'required_without:fone_secundario',
-            'fone_secundario' => 'required_without:fone_principal',
-            'numero' => '',
-        ]);
-
-        if ($request->isNotFilled('numero')) {
-            $request->merge(['numero' => 'SN']);
-        }
-
-        if ($request->tipo_pessoa === 'F' and $request->inscricao_estadual) {
-            $request->request->remove('inscricao_estadual');
-        }
-
-        if ($request->estado == 'Goiás' and $request->tipo_cadastro == 'Variante') {
-            $request->merge([
-                'message' => [
-                    'Mandar equipe de campo'
-                ]
-            ]);
-        }
-
-        if ($request->estado == 'São Paulo' and
-            $request->tipo_cadastro == 'Variante' and
-            $request->tipo_pessoa == 'F'
-        ) {
-            $request->merge(['message' => ['Reavaliar em 2 meses']]);
-        }
-
-        if ($request->estado == 'Ceará' and
-            $request->tipo_cadastro == 'Variante' and
-            $request->tipo_pessoa == 'F' and
-            $request->filled('observacao')) {
-            $request->merge(['message' => ['Possível violação do tratado Beta']]);
-        }
-
-        if ($request->estado == 'Tocantins' and
-            $request->tipo_cadastro == 'Variante' and
-            $request->tipo_pessoa == 'F' and
-            $request->filled('observacao')) {
-            $request->merge(['message' => ['Possível violação do tratado Celta']]);
-        }
-
-        if ($request->estado == 'Amazonas' and
-            $request->tipo_cadastro == 'Variante' and
-            $request->tipo_pessoa == 'F' and
-            $request->filled('observacao')
-        ) {
-            $request->merge(['message' => ['Possível violação do tratado Alpha']]);
-        }
-
-        if ($request->has('cpf_cnpj')) {
-            $request->request->remove('cpf_cnpj');
-        }
+        $validacao = Validator::make($request->all(), $request->rules());
 
         if ($validacao->fails()) {
             return response()->json($validacao->errors());

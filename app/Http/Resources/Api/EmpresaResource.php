@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api;
 
+use \Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class EmpresaResource extends JsonResource
@@ -9,28 +10,29 @@ class EmpresaResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        $response = [
+        return [
             'id' => $this->id,
             'razao_social' => $this->razao_social,
-            'cpf_cnpj' => $this->cpf_cnpj,
+            $this->mergeWhen($request->isMethod('post'), [
+                'cpf_cnpj' => $this->cpf_cnpj,
+            ]),
+            'tipo_pessoa' => $this->tipo_pessoa === 'F' ? 'Física' : 'Jurídica',
+            'tipo_contribuinte' => boolval($this->tipo_contribuinte),
+            'tipo_cadastro' => $this->tipo_cadastro,
             'endereco' => [
-                'logradouro' => $this->logradouro
-            ]
-        ];
-
-        if($request->method() == 'POST') {
-            $response = array_merge($response, [
-                'alerts' => [
+                'logradouro' => $this->logradouro,
+                'cidade' => $this->cidade,
+                'estado' => $this->estado,
+            ],
+            $this->mergeWhen($request->isMethod('post'), [
+                'alertas' => [
                     $request->message
                 ]
-            ]);
-        }
-
-        return $response;
+            ])
+        ];
     }
 }

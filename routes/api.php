@@ -22,13 +22,13 @@ Route::post('auth/login', 'Api\AuthController@login');
 Route::middleware(['apiJwt'])->group(function () {
     Route::post('auth/logout', 'Api\AuthController@logout');
 
-    Route::post('empresa', 'Api\EmpresaController@store');
     Route::get('empresas', 'Api\EmpresaController@index');
-    Route::get('empresas/search', 'Api\EmpresaController@search');
     Route::get('empresa/edit', 'Api\EmpresaController@edit');
+
+    Route::post('empresa', 'Api\EmpresaController@store');
+    Route::put('empresa/{empresa}', 'Api\Empresacontroller@update');
     Route::delete('empresa/delete', 'Api\EmpresaController@destroy');
 
-    Route::put('empresa/{empresa}', 'Api\Empresacontroller@update');
     Route::get('verifyCnpj', 'Api\Empresacontroller@verifyCnpj');
 
     Route::get('users', 'Api\UserController@index');
