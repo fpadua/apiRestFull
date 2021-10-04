@@ -71,6 +71,10 @@ class EmpresaRequest extends FormRequest
             $this->merge(['message' => ['Possível violação do tratado Alpha']]);
         }
 
+        if($this->isMethod('post')) {
+            [ 'cpf_cnpj' => 'required',];
+        }
+
         return [
             'tipo_pessoa' => 'required',
             'tipo_contribuinte' => 'required',
@@ -78,8 +82,6 @@ class EmpresaRequest extends FormRequest
             'estado' => 'required',
             'cidade' => 'required',
             'pais' => 'required',
-
-            'cpf_cnpj' => 'required',
             'razao_social' => 'required',
             'email' => 'email',
 
