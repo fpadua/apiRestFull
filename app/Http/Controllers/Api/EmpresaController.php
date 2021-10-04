@@ -109,7 +109,7 @@ class EmpresaController extends Controller
             return response()->json($validacao->errors());
         }
 
-        $empresa->update($request->all());
+        $empresa->update($request->request->all());
 
         return EmpresaResource::collection([$empresa]);
     }
