@@ -29,7 +29,7 @@ Route::middleware(['apiJwt'])->group(function () {
     Route::get('empresa/edit', 'Api\EmpresaController@edit');
 
     Route::post('empresa', 'Api\EmpresaController@store');
-    Route::put('empresa/{empresa}', 'Api\Empresacontroller@update');
+    Route::put('empresa/{empresa}', 'Api\EmpresaController@update');
     Route::delete('empresa/delete', 'Api\EmpresaController@destroy');
 
     Route::get('verifyCnpj', 'Api\Empresacontroller@verifyCnpj');
