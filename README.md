@@ -76,7 +76,7 @@
 
 ##
 
-**PUT:** [/api/empresa/edit?id={id}]()
+**GET:** [/api/empresa/edit?id={id}]()
 
     - Authorization: [Token Bearer]
     [params]
@@ -85,7 +85,7 @@
 
 ##
 
-**POST:** [api/empresa/{id}]()
+**PUT:** [api/empresa/{id}]()
 
     - Authorization: [Token Bearer]
     [body]
