@@ -73,6 +73,8 @@ class EmpresaRequest extends FormRequest
 
         if($this->isMethod('post')) {
             [ 'cpf_cnpj' => 'required',];
+        } else {
+            $this->request->remove('cpf_cnpj');
         }
 
         return [
